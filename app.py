@@ -157,9 +157,14 @@ LAYOUT = dict(
     font=dict(color="#8892a4", size=11),
     margin=dict(l=8, r=8, t=32, b=8),
     legend=dict(orientation="h", y=-0.18, font=dict(size=11)),
-    xaxis=dict(gridcolor="#2a2d3e", tickfont=dict(size=10)),
-    yaxis=dict(gridcolor="#2a2d3e", tickfont=dict(size=10)),
 )
+
+AXIS_X = dict(gridcolor="#2a2d3e", tickfont=dict(size=10))
+AXIS_Y = dict(gridcolor="#2a2d3e", tickfont=dict(size=10))
+
+def L(**kwargs):
+    """Mescla LAYOUT base com parâmetros extras sem conflito de chaves."""
+    return {**LAYOUT, "xaxis": AXIS_X, "yaxis": AXIS_Y, **kwargs}
 
 # ── HEADER ────────────────────────────────────────────────────────────────────
 st.markdown("""
@@ -231,13 +236,13 @@ fig_main.add_trace(go.Scatter(
     marker=dict(size=4), fill="tozeroy",
     fillcolor="rgba(108,99,255,.08)"
 ))
-fig_main.update_layout(
-    **LAYOUT,
+fig_main.update_layout(L(
     barmode="stack",
     title=dict(text="Receita Bruta vs Custos vs EBITDA (24 meses)", font=dict(color="#e2e8f0", size=13)),
     yaxis=dict(tickprefix="R$ ", gridcolor="#2a2d3e", tickfont=dict(size=10)),
+    xaxis=dict(gridcolor="#2a2d3e", tickfont=dict(size=10), tickangle=45),
     height=320,
-)
+))
 st.plotly_chart(fig_main, use_container_width=True)
 
 # Gráficos em 2 colunas
@@ -251,12 +256,12 @@ with col1:
         mode="lines+markers", marker=dict(size=4),
         name="EBITDA R$"
     ))
-    fig_ebitda.update_layout(
-        **LAYOUT,
+    fig_ebitda.update_layout(L(
         title=dict(text="EBITDA R$ — Evolução Mensal", font=dict(color="#e2e8f0", size=13)),
-        yaxis=dict(tickprefix="R$ ", gridcolor="#2a2d3e"),
-        height=280, showlegend=False
-    )
+        yaxis=dict(tickprefix="R$ ", gridcolor="#2a2d3e", tickfont=dict(size=10)),
+        xaxis=dict(gridcolor="#2a2d3e", tickfont=dict(size=10), tickangle=45),
+        height=280, showlegend=False,
+    ))
     st.plotly_chart(fig_ebitda, use_container_width=True)
 
 with col2:
@@ -271,11 +276,11 @@ with col2:
         name="Investimento Ads", line=dict(color="#ffd166", width=2),
         fill="tozeroy", fillcolor="rgba(255,209,102,.08)"
     ), secondary_y=True)
-    fig_inv.update_layout(
-        **LAYOUT,
+    fig_inv.update_layout(L(
         title=dict(text="Investimento Ads vs Receita", font=dict(color="#e2e8f0", size=13)),
-        height=280
-    )
+        xaxis=dict(gridcolor="#2a2d3e", tickfont=dict(size=10), tickangle=45),
+        height=280,
+    ))
     fig_inv.update_yaxes(tickprefix="R$ ", gridcolor="#2a2d3e", secondary_y=False)
     fig_inv.update_yaxes(tickprefix="R$ ", gridcolor="rgba(0,0,0,0)", secondary_y=True)
     st.plotly_chart(fig_inv, use_container_width=True)
@@ -292,12 +297,12 @@ with col1:
         line=dict(color="#ec4899", width=2.5),
         mode="lines+markers", marker=dict(size=4), name="ROAS"
     ))
-    fig_roas.update_layout(
-        **LAYOUT,
+    fig_roas.update_layout(L(
         title=dict(text="ROAS — Queda Planejada Trimestral", font=dict(color="#e2e8f0", size=13)),
-        yaxis=dict(ticksuffix="x", gridcolor="#2a2d3e"),
-        height=260, showlegend=False
-    )
+        yaxis=dict(ticksuffix="x", gridcolor="#2a2d3e", tickfont=dict(size=10)),
+        xaxis=dict(gridcolor="#2a2d3e", tickfont=dict(size=10), tickangle=45),
+        height=260, showlegend=False,
+    ))
     st.plotly_chart(fig_roas, use_container_width=True)
 
 with col2:
@@ -307,11 +312,11 @@ with col2:
         marker_line_color="#6c63ff", marker_line_width=1,
         name="Pedidos"
     ))
-    fig_ped.update_layout(
-        **LAYOUT,
+    fig_ped.update_layout(L(
         title=dict(text="Pedidos Finalizados / Mês", font=dict(color="#e2e8f0", size=13)),
-        height=260, showlegend=False
-    )
+        xaxis=dict(gridcolor="#2a2d3e", tickfont=dict(size=10), tickangle=45),
+        height=260, showlegend=False,
+    ))
     st.plotly_chart(fig_ped, use_container_width=True)
 
 with col3:
@@ -325,12 +330,12 @@ with col3:
         x=d["meses"], y=d["margem_pct"],
         name="Margem Contrib. %", line=dict(color="#ffd166", width=2, dash="dot"),
     ))
-    fig_marg.update_layout(
-        **LAYOUT,
+    fig_marg.update_layout(L(
         title=dict(text="Margens % — EBITDA & Contribuição", font=dict(color="#e2e8f0", size=13)),
-        yaxis=dict(ticksuffix="%", gridcolor="#2a2d3e", range=[0, 55]),
-        height=260
-    )
+        yaxis=dict(ticksuffix="%", gridcolor="#2a2d3e", tickfont=dict(size=10), range=[0, 55]),
+        xaxis=dict(gridcolor="#2a2d3e", tickfont=dict(size=10), tickangle=45),
+        height=260,
+    ))
     st.plotly_chart(fig_marg, use_container_width=True)
 
 # ── COMPARATIVO ANO1 vs ANO2 ─────────────────────────────────────────────────
@@ -349,12 +354,13 @@ with col1:
         x=meses_curtos, y=d["receita"][12:],
         name="ANO2", marker_color="rgba(0,212,170,.7)", marker_line_width=0
     ))
-    fig_comp.update_layout(
-        **LAYOUT, barmode="group",
+    fig_comp.update_layout(L(
+        barmode="group",
         title=dict(text="Receita — ANO1 vs ANO2 (mesmo mês)", font=dict(color="#e2e8f0", size=13)),
-        yaxis=dict(tickprefix="R$ ", gridcolor="#2a2d3e"),
-        height=280
-    )
+        yaxis=dict(tickprefix="R$ ", gridcolor="#2a2d3e", tickfont=dict(size=10)),
+        xaxis=dict(gridcolor="#2a2d3e", tickfont=dict(size=10)),
+        height=280,
+    ))
     st.plotly_chart(fig_comp, use_container_width=True)
 
 with col2:
@@ -367,12 +373,13 @@ with col2:
         x=d["meses"], y=d["custos_fixos"],
         name="Custo Fixo", marker_color="rgba(255,209,102,.65)",
     ))
-    fig_custos.update_layout(
-        **LAYOUT, barmode="stack",
+    fig_custos.update_layout(L(
+        barmode="stack",
         title=dict(text="Composição dos Custos — Fixos vs Variáveis", font=dict(color="#e2e8f0", size=13)),
-        yaxis=dict(tickprefix="R$ ", gridcolor="#2a2d3e"),
-        height=280
-    )
+        yaxis=dict(tickprefix="R$ ", gridcolor="#2a2d3e", tickfont=dict(size=10)),
+        xaxis=dict(gridcolor="#2a2d3e", tickfont=dict(size=10), tickangle=45),
+        height=280,
+    ))
     st.plotly_chart(fig_custos, use_container_width=True)
 
 # ── TABELA DRE DETALHADA ──────────────────────────────────────────────────────
